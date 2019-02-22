@@ -36,20 +36,14 @@
   <builders>
     <hudson.tasks.Shell>
       <command>git checkout dev
-grep version $1 setup.py &gt;1.txt
-cut -d= -f2 1.txt &gt;2.txt
-cut -d- -f1 2.txt &gt;1.txt
-sed &apos;s/^.//&apos; 1.txt &gt;2.txt
-mv 2.txt 1.txt
-cat 1.txt
-major_version=$(cat 1.txt| cut -d. -f1)
-minor_version=$(cat 1.txt | cut -d. -f2)
-hotfix_version=$(cat 1.txt | cut -d. -f3)
+oh=$(grep version setup.py | cut -d= -f2 | cut -d- -f1 | sed &apos;s/^.//&apos;)
+major_version=$(echo $oh| cut -d. -f1)
+minor_version=$(echo $oh | cut -d. -f2)
+hotfix_version=$(echo $oh | cut -d. -f3)
 echo &quot;${major_version}.${minor_version}.$(( ${hotfix_version}+1))&quot;
 funk=&quot;${major_version}.${minor_version}.$(( ${hotfix_version}+1))&quot;
 sed &quot;s/version=.*/version=&apos;$funk-SNAPSHOT&apos;,/g&quot;  setup.py &gt;2.txt
 mv 2.txt setup.py
-rm 1.txt
 git add .
 git commit -m &quot;updated version&quot;</command>
     </hudson.tasks.Shell>
