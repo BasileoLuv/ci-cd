@@ -1,0 +1,204 @@
+<?xml version='1.1' encoding='UTF-8'?>
+<project>
+  <actions/>
+  <description></description>
+  <keepDependencies>false</keepDependencies>
+  <properties>
+    <com.coravy.hudson.plugins.github.GithubProjectProperty plugin="github@1.29.3">
+      <projectUrl>https://github.com/BasileoLuv/simple-python-service/</projectUrl>
+      <displayName></displayName>
+    </com.coravy.hudson.plugins.github.GithubProjectProperty>
+  </properties>
+  <scm class="hudson.plugins.git.GitSCM" plugin="git@4.0.0-rc">
+    <configVersion>2</configVersion>
+    <userRemoteConfigs>
+      <hudson.plugins.git.UserRemoteConfig>
+        <url>git@github.com:BasileoLuv/simple-python-service.git</url>
+        <credentialsId>8ffcf81c-2bd1-4681-882d-68cbd141b491</credentialsId>
+      </hudson.plugins.git.UserRemoteConfig>
+    </userRemoteConfigs>
+    <branches>
+      <hudson.plugins.git.BranchSpec>
+        <name>*/dev</name>
+      </hudson.plugins.git.BranchSpec>
+    </branches>
+    <doGenerateSubmoduleConfigurations>false</doGenerateSubmoduleConfigurations>
+    <submoduleCfg class="list"/>
+    <extensions/>
+  </scm>
+  <canRoam>true</canRoam>
+  <disabled>false</disabled>
+  <blockBuildWhenDownstreamBuilding>false</blockBuildWhenDownstreamBuilding>
+  <blockBuildWhenUpstreamBuilding>false</blockBuildWhenUpstreamBuilding>
+  <jdk>JDK 8</jdk>
+  <triggers>
+    <hudson.triggers.SCMTrigger>
+      <spec> * * * * *</spec>
+      <ignorePostCommitHooks>false</ignorePostCommitHooks>
+    </hudson.triggers.SCMTrigger>
+  </triggers>
+  <concurrentBuild>false</concurrentBuild>
+  <builders>
+    <hudson.tasks.Shell>
+      <command>curl -L https://bootstrap.pypa.io/get-pip.py | python
+pip install --upgrade pip
+pip install twine
+git show --summary | awk &apos;{print $2}&apos; | head -1 &gt;newcommit.txt 
+grep version $1 setup.py &gt;curr-snapshot.txt
+cut -d= -f2 curr-snapshot.txt &gt;2.txt
+cut -d- -f1 2.txt &gt;curr-snapshot.txt
+sed &apos;s/^.//&apos; curr-snapshot.txt &gt;2.txt
+mv 2.txt curr-snapshot.txt
+python version.py &gt;timestamp.txt
+test1=$(cat timestamp.txt)
+echo $test1
+version=$(cat curr-snapshot.txt)
+echo $version
+python setup.py sdist bdist_wheel
+mv dist/Python-Calculator*.tar.gz dist/Python-Calculator-$version-$test1.tar.gz
+mv dist/Python_Calculator* dist/Python-Calculator-$version-$test1-py2-none-any.whl
+rm timestamp.txt 
+echo First job is successfully
+python2.7 -m twine upload dist/* --repository-url http://nexus:8081/repository/pypi/ -u admin -p admin123 --skip-existing</command>
+    </hudson.tasks.Shell>
+  </builders>
+  <publishers/>
+  <buildWrappers>
+    <hudson.plugins.ws__cleanup.PreBuildCleanup plugin="ws-cleanup@0.37">
+      <deleteDirs>false</deleteDirs>
+      <cleanupParameter></cleanupParameter>
+      <externalDelete></externalDelete>
+      <disableDeferredWipeout>false</disableDeferredWipeout>
+    </hudson.plugins.ws__cleanup.PreBuildCleanup>
+    <hudson.tasks.AntWrapper plugin="ant@1.9">
+      <jdk>JDK 8</jdk>
+    </hudson.tasks.AntWrapper>
+  </buildWrappers>
+</project>[root@af49442055e3 simple-python-service-dev-build]# cd ..
+[root@af49442055e3 jobs]# cat simple-python-service-master-release/config.xml 
+<?xml version='1.1' encoding='UTF-8'?>
+<project>
+  <actions/>
+  <description></description>
+  <keepDependencies>false</keepDependencies>
+  <properties>
+    <com.coravy.hudson.plugins.github.GithubProjectProperty plugin="github@1.29.3">
+      <projectUrl>https://github.com/BasileoLuv/simple-python-service/</projectUrl>
+      <displayName></displayName>
+    </com.coravy.hudson.plugins.github.GithubProjectProperty>
+    <hudson.model.ParametersDefinitionProperty>
+      <parameterDefinitions>
+        <hudson.model.StringParameterDefinition>
+          <name>versionandtimestamp</name>
+          <description>example:
+0.4.4-20190221.060108</description>
+          <defaultValue></defaultValue>
+          <trim>false</trim>
+        </hudson.model.StringParameterDefinition>
+      </parameterDefinitions>
+    </hudson.model.ParametersDefinitionProperty>
+  </properties>
+  <scm class="hudson.plugins.git.GitSCM" plugin="git@4.0.0-rc">
+    <configVersion>2</configVersion>
+    <userRemoteConfigs>
+      <hudson.plugins.git.UserRemoteConfig>
+        <url>git@github.com:BasileoLuv/simple-python-service.git</url>
+        <credentialsId>8ffcf81c-2bd1-4681-882d-68cbd141b491</credentialsId>
+      </hudson.plugins.git.UserRemoteConfig>
+    </userRemoteConfigs>
+    <branches>
+      <hudson.plugins.git.BranchSpec>
+        <name>*/master</name>
+      </hudson.plugins.git.BranchSpec>
+    </branches>
+    <doGenerateSubmoduleConfigurations>false</doGenerateSubmoduleConfigurations>
+    <submoduleCfg class="list"/>
+    <extensions/>
+  </scm>
+  <canRoam>true</canRoam>
+  <disabled>false</disabled>
+  <blockBuildWhenDownstreamBuilding>false</blockBuildWhenDownstreamBuilding>
+  <blockBuildWhenUpstreamBuilding>false</blockBuildWhenUpstreamBuilding>
+  <jdk>JDK 8</jdk>
+  <triggers/>
+  <concurrentBuild>false</concurrentBuild>
+  <builders>
+    <hudson.tasks.Shell>
+      <command>git checkout master
+git branch
+grep version setup.py &gt;curr-snapshot.txt
+cut -d= -f2 curr-snapshot.txt &gt;2.txt
+cut -d- -f1 2.txt &gt;curr-snapshot.txt
+sed &apos;s/^.//&apos; curr-snapshot.txt &gt;2.txt
+mv 2.txt curr-snapshot.txt
+mv curr-snapshot.txt curr-release.txt
+git add curr-release.txt
+git commit -m &quot;Added release version in txt file&quot;
+cat curr-release.txt
+
+
+snapshot_version=$versionandtimestamp
+release_version=$(echo $snapshot_version | cut -d- -f1)
+echo $release_version
+echo &quot;http://nexus:8081/repository/pypi/packages/python-calculator/${release_version}-SNAPSHOT/Python-Calculator-${snapshot_version}.tar.gz&quot;
+wget http://nexus:8081/repository/pypi/packages/python-calculator/${release_version}-SNAPSHOT/Python-Calculator-${snapshot_version}.tar.gz
+tar xvzf Python-Calculator-${snapshot_version}.tar.gz
+rm Python-Calculator-${snapshot_version}.tar.gz
+
+git status
+cd Python-*
+
+</command>
+    </hudson.tasks.Shell>
+    <hudson.tasks.Shell>
+      <command>cd Python-*
+currsnapshot=$(cat curr-snapshot.txt )
+currrelease=$(cat ../curr-release.txt )
+echo $currsnapshot
+echo $currrelease
+
+if [  $currsnapshot &lt;  $currrelease ]
+then 
+  exit 1
+else 
+  git merge $(cat newcommit.txt)
+  git tag $(cat newcommit.txt)
+fi</command>
+    </hudson.tasks.Shell>
+    <hudson.tasks.Shell>
+      <command>cd Python-*
+python setup.py sdist bdist_wheel
+currsnapshot=$(cat curr-snapshot.txt )
+mv dist/Python-Calculator*.tar.gz dist/Python-Calculator-$currsnapshot.tar.gz
+mv dist/Python_Calculator*.whl dist/Python-Calculator-$currsnapshot-py2-none-any.whl
+python2.7 -m twine upload dist/* --repository-url http://nexus:8081/repository/pypi-releases/ -u admin -p admin123 --skip-existing
+cd ..
+rm -r Python-*
+rm curr-release.txt
+git rm curr-release.txt
+git commit -m &quot;updated master&quot;</command>
+    </hudson.tasks.Shell>
+  </builders>
+  <publishers>
+    <hudson.plugins.git.GitPublisher plugin="git@4.0.0-rc">
+      <configVersion>2</configVersion>
+      <pushMerge>false</pushMerge>
+      <pushOnlyIfSuccess>true</pushOnlyIfSuccess>
+      <forcePush>false</forcePush>
+      <branchesToPush>
+        <hudson.plugins.git.GitPublisher_-BranchToPush>
+          <targetRepoName>origin</targetRepoName>
+          <branchName>master</branchName>
+        </hudson.plugins.git.GitPublisher_-BranchToPush>
+      </branchesToPush>
+    </hudson.plugins.git.GitPublisher>
+  </publishers>
+  <buildWrappers>
+    <hudson.plugins.ws__cleanup.PreBuildCleanup plugin="ws-cleanup@0.37">
+      <deleteDirs>false</deleteDirs>
+      <cleanupParameter></cleanupParameter>
+      <externalDelete></externalDelete>
+      <disableDeferredWipeout>false</disableDeferredWipeout>
+    </hudson.plugins.ws__cleanup.PreBuildCleanup>
+  </buildWrappers>
+</project>
