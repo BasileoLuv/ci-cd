@@ -45,7 +45,6 @@ pip install --upgrade pip
 pip install twine
 git show --summary | awk &apos;{print $2}&apos; | head -1 &gt;newcommit.txt 
 oh=$(grep version setup.py | cut -d= -f2 | cut -d- -f1 | sed &apos;s/^.//&apos;)
-echo $oh&gt;curr-snapshot.txt
 timestamp=$( date +&apos;%Y%m%d.%H%M%S&apos;)
 python setup.py sdist bdist_wheel
 mv dist/Python-Calculator*.tar.gz dist/Python-Calculator-$oh-$timestamp.tar.gz

@@ -47,8 +47,8 @@
   <builders>
     <hudson.tasks.Shell>
       <command>git checkout master
-git branch
 currrelease=$(grep version setup.py | cut -d= -f2 | cut -d- -f1 | sed &apos;s/^.//&apos;)
+currsnapshot=$(grep version setup.py | cut -d= -f2 | cut -d- -f1 | sed &apos;s/^.//&apos;)
 snapshot_version=$versionandtimestamp
 release_version=$(echo $snapshot_version | cut -d- -f1)
 echo $release_version
@@ -56,7 +56,10 @@ echo &quot;http://nexus:8081/repository/pypi/packages/python-calculator/${releas
 wget http://nexus:8081/repository/pypi/packages/python-calculator/${release_version}-SNAPSHOT/Python-Calculator-${snapshot_version}.tar.gz
 tar xvzf Python-Calculator-${snapshot_version}.tar.gz
 rm Python-Calculator-${snapshot_version}.tar.gz
-</command>
+sed &quot;s/version=.*/version=&apos;$currsnapshot&apos;,/g&quot;  setup.py &gt;2.txt
+mv 2.txt setup.py
+git add setup.py
+git commit -m &quot;Updated version&quot;</command>
     </hudson.tasks.Shell>
     <hudson.tasks.Shell>
       <command>cd Python-*
@@ -75,8 +78,7 @@ fi
 python setup.py sdist bdist_wheel
 mv dist/Python-Calculator*.tar.gz dist/Python-Calculator-$currsnapshot.tar.gz
 mv dist/Python_Calculator*.whl dist/Python-Calculator-$currsnapshot-py2-none-any.whl
-python2.7 -m twine upload dist/* --repository-url http://nexus:8081/repository/pypi-releases/ -u admin -p admin123 --skip-existing
-</command>
+python2.7 -m twine upload dist/* --repository-url http://nexus:8081/repository/pypi-releases/ -u admin -p admin123 --skip-existing</command>
     </hudson.tasks.Shell>
   </builders>
   <publishers>
