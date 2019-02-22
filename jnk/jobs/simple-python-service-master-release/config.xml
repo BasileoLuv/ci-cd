@@ -62,7 +62,8 @@ git add setup.py
 git commit -m &quot;Updated version&quot;</command>
     </hudson.tasks.Shell>
     <hudson.tasks.Shell>
-      <command>cd Python-*
+      <command>currrelease=$(grep version setup.py | cut -d= -f2 | cut -d- -f1 | sed &apos;s/^.//&apos;)
+cd Python-*
 currsnapshot=$(grep version setup.py | cut -d= -f2 | cut -d- -f1 | sed &apos;s/^.//&apos;)
 echo $currsnapshot
 echo $currrelease

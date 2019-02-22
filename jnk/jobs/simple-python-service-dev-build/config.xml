@@ -44,11 +44,11 @@
 pip install --upgrade pip
 pip install twine
 git show --summary | awk &apos;{print $2}&apos; | head -1 &gt;newcommit.txt 
-oh=$(grep version setup.py | cut -d= -f2 | cut -d- -f1 | sed &apos;s/^.//&apos;)
+vers=$(grep version setup.py | cut -d= -f2 | cut -d- -f1 | sed &apos;s/^.//&apos;)
 timestamp=$( date +&apos;%Y%m%d.%H%M%S&apos;)
 python setup.py sdist bdist_wheel
-mv dist/Python-Calculator*.tar.gz dist/Python-Calculator-$oh-$timestamp.tar.gz
-mv dist/Python_Calculator* dist/Python-Calculator-$oh-$timestamp-py2-none-any.whl
+mv dist/Python-Calculator*.tar.gz dist/Python-Calculator-$vers-$timestamp.tar.gz
+mv dist/Python_Calculator* dist/Python-Calculator-$vers-$timestamp-py2-none-any.whl
 python2.7 -m twine upload dist/* --repository-url http://nexus:8081/repository/pypi/ -u admin -p admin123 --skip-existing</command>
     </hudson.tasks.Shell>
   </builders>
