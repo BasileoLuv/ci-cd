@@ -11,7 +11,7 @@
     <hudson.model.ParametersDefinitionProperty>
       <parameterDefinitions>
         <hudson.model.StringParameterDefinition>
-          <name>versionandtimestamp</name>
+          <name>snapshot_version</name>
           <description>example:
 0.4.4-20190221.060108</description>
           <defaultValue></defaultValue>
@@ -46,23 +46,15 @@
   <concurrentBuild>false</concurrentBuild>
   <builders>
     <hudson.tasks.Shell>
-      <command>git checkout master
-currsnapshot=$(grep version setup.py | cut -d= -f2 | cut -d- -f1 | sed &apos;s/^.//&apos;)
-snapshot_version=$versionandtimestamp
+      <command>currrelease=$(grep version setup.py | cut -d= -f2 | cut -d- -f1 | sed &apos;s/^.//&apos; | sed &apos;s/.\{2\}$//&apos;)
 release_version=$(echo $snapshot_version | cut -d- -f1)
 echo $release_version
 echo &quot;http://nexus:8081/repository/pypi/packages/python-calculator/${release_version}-SNAPSHOT/Python-Calculator-${snapshot_version}.tar.gz&quot;
 wget http://nexus:8081/repository/pypi/packages/python-calculator/${release_version}-SNAPSHOT/Python-Calculator-${snapshot_version}.tar.gz
 tar xvzf Python-Calculator-${snapshot_version}.tar.gz
 rm Python-Calculator-${snapshot_version}.tar.gz
-TEMP=$(mktemp /tmp/temporary-file.XXXXXXXX)
-sed &quot;s/version=.*/version=&apos;$currsnapshot&apos;,/g&quot;  setup.py &gt;$TEMP
-mv $TEMP setup.py
-git add setup.py
-git commit -m &quot;Updated version&quot;</command>
-    </hudson.tasks.Shell>
-    <hudson.tasks.Shell>
-      <command>currrelease=$(grep version setup.py | cut -d= -f2 | cut -d- -f1 | sed &apos;s/^.//&apos;)
+
+
 cd Python-*
 currsnapshot=$(grep version setup.py | cut -d= -f2 | cut -d- -f1 | sed &apos;s/^.//&apos;)
 echo $currsnapshot
@@ -74,6 +66,13 @@ then
 else 
   git merge $(cat newcommit.txt)
   git tag $(echo $currsnapshot)
+    cd ..
+    TEMP=$(mktemp /tmp/temporary-file.XXXXXXXX)
+  sed &quot;s/version=.*/version=&apos;$currsnapshot&apos;,/g&quot;  setup.py &gt;$TEMP
+  mv $TEMP setup.py
+  git add setup.py
+  git commit -m &quot;Updated version&quot;
+    cd Python-*
 fi
 
 python setup.py sdist bdist_wheel
