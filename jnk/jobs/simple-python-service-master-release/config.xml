@@ -46,7 +46,8 @@
   <concurrentBuild>false</concurrentBuild>
   <builders>
     <hudson.tasks.Shell>
-      <command>currrelease=$(grep version setup.py | cut -d= -f2 | cut -d- -f1 | sed &apos;s/^.//&apos; | sed &apos;s/.\{2\}$//&apos;)
+      <command>
+currrelease=$(grep version setup.py | cut -d= -f2 | cut -d- -f1 | sed &apos;s/^.//&apos; | sed &apos;s/.\{2\}$//&apos;)
 release_version=$(echo $snapshot_version | cut -d- -f1)
 echo $release_version
 echo &quot;http://nexus:8081/repository/pypi/packages/python-calculator/${release_version}-SNAPSHOT/Python-Calculator-${snapshot_version}.tar.gz&quot;
@@ -65,13 +66,13 @@ then
   exit 1
 else 
   git merge $(cat newcommit.txt)
-  git tag $(echo $currsnapshot)
     cd ..
     TEMP=$(mktemp /tmp/temporary-file.XXXXXXXX)
   sed &quot;s/version=.*/version=&apos;$currsnapshot&apos;,/g&quot;  setup.py &gt;$TEMP
   mv $TEMP setup.py
   git add setup.py
-  git commit -m &quot;Updated version&quot;
+  git commit -m &quot;master version=$currsnapshot&quot;
+    git tag $(echo $currsnapshot)
     cd Python-*
 fi
 
@@ -86,7 +87,7 @@ python2.7 -m twine upload dist/* --repository-url http://nexus:8081/repository/p
       <configVersion>2</configVersion>
       <pushMerge>false</pushMerge>
       <pushOnlyIfSuccess>true</pushOnlyIfSuccess>
-      <forcePush>false</forcePush>
+      <forcePush>true</forcePush>
       <branchesToPush>
         <hudson.plugins.git.GitPublisher_-BranchToPush>
           <targetRepoName>origin</targetRepoName>
